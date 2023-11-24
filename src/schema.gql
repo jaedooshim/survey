@@ -46,7 +46,7 @@ type Guest {
   totalScore: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
-  survey: Survey!
+  survey: Survey
   answers: [Answer!]!
 }
 
