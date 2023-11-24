@@ -24,6 +24,10 @@ export class Survey {
   title: string;
 
   @Field()
+  @Column({ type: 'varchar', length: 255 })
+  description: string;
+
+  @Field()
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
