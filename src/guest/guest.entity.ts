@@ -42,7 +42,7 @@ export class Guest {
   @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt: Date;
 
-  @Field(() => Survey)
+  @Field(() => Survey, { nullable: true })
   @ManyToOne(() => Survey, (survey) => survey.guests)
   survey: Survey;
 
