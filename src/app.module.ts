@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ormConfig } from './_common/typeorm.config';
 import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 
 @Module({
   imports: [
@@ -18,7 +19,14 @@ import { GraphQLModule } from '@nestjs/graphql';
     GuestModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
-    GraphQLModule.forRoot({ autoSchemaFile: './src/schema.gql' }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      autoSchemaFile: './src/schema.gql',
+      driver: ApolloDriver,
+      formatError: (error) => {
+        console.log(error);
+        return error;
+      },
+    }),
   ],
   controllers: [],
   providers: [],
