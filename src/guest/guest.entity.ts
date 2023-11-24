@@ -28,6 +28,10 @@ export class Guest {
   tel: string;
 
   @Field()
+  @Column({ default: 0 })
+  totalScore: number;
+
+  @Field()
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
