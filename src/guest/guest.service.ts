@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Survey } from '../survey/survey.entity';
 import { CreateGuest } from './guest.dto';
 import { ApolloError } from 'apollo-server-express';
+import { Answer } from '../answer/answer.entity';
 
 @Injectable()
 export class GuestService {
@@ -13,6 +14,8 @@ export class GuestService {
     private guestRepository: Repository<Guest>,
     @InjectRepository(Survey)
     private surveyRepository: Repository<Survey>,
+    @InjectRepository(Answer)
+    private answerRepository: Repository<Answer>,
   ) {}
 
   /* 설문자 등록 */
@@ -37,7 +40,25 @@ export class GuestService {
   /* 설문자 전체조회 */
   async findAllGuest(): Promise<Guest[]> {
     try {
-      return this.guestRepository.find();
+      const guests = await this.guestRepository.find({ relations: ['survey'] });
+      const guestsTotalScore = await Promise.all(
+        guests.map(async (guest) => {
+          const surveyId = guest.survey.id;
+          const totalScoreResult = await this.answerRepository
+            .createQueryBuilder('answer')
+            .leftJoin('answer.guest', 'guest')
+            .leftJoin('answer.select', 'select')
+            .where('guest.id = :guestId', { guestId: guest.id })
+            .andWhere('answer.survey.id = :surveyId', { surveyId })
+            .select('SUM(select.score)', 'totalScore')
+            .getRawOne();
+          const totalScore = totalScoreResult.totalScore || 0;
+          return { ...guest, totalScore };
+        }),
+      );
+      return guestsTotalScore;
+      // 이렇게만 하면 전체조회시 어느 설문지의 총점인지 모름
+      // return this.guestRepository.find();
     } catch (err) {
       throw new ApolloError(err.message, '500', { '설문자 전체 조회에 실패하였습니다.': err.message });
     }
