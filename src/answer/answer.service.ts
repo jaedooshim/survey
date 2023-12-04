@@ -102,7 +102,7 @@ export class AnswerService {
   async updateAnswer(update: UpdateAnswer): Promise<Answer> {
     const { id, surveyId, guestId, questionId, selectId } = update;
 
-    const answer = await this.answerRepository.findOne({ where: { id } });
+    const answer = await this.answerRepository.findOne({ where: { id }, relations: ['select'] });
     if (!answer) {
       throw new ApolloError('해당하는 답변이 존재하지 않습니다.');
     }
@@ -140,13 +140,16 @@ export class AnswerService {
       }
       answer.select = select;
     }
-
+    if (!answer.select) {
+      throw new ApolloError('답변에 연결된 선택지가 존재하지 않습니다.');
+    }
     const newScore = answer.select.score;
 
     // Guest의 총점 업데이트(기존 점수 빼고 새 점수를 더 함)
-    answer.guest.totalScore = answer.guest.totalScore - oldScore + newScore;
-    await this.guestRepository.save(answer.guest);
-
+    if (oldScore !== undefined && newScore !== undefined) {
+      answer.guest.totalScore = answer.guest.totalScore - oldScore + newScore;
+      await this.guestRepository.save(answer.guest);
+    }
     const updatedAnswer = await this.answerRepository.save(answer);
     return updatedAnswer;
   }
