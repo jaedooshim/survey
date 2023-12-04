@@ -26,6 +26,7 @@ import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
         console.log(error);
         return error;
       },
+      playground: true,
     }),
   ],
   controllers: [],
