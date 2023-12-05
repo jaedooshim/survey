@@ -37,7 +37,7 @@ npm i | npm install
 
 ### DESC
 
-- DB Postgre는 Docker를 이용해 사용했음
+- PostgresDB의 경우 Docker 컨테이터를 활용하여 개발환경 구축
 - 각 환경변수에 맞는 값들은 본인의 호스트 등 확인하여 입력
 - localhost:4000 포트 사용
 - env파일의 구조 (PG_NAME은 데이터베이스의 이름입니다.)
